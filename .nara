@@ -1,0 +1,7 @@
+#Thu Jan 28 10:52:01 KST 2021
+storeType=MariaDB
+groupId=io.naradrama
+buildMethod=Gradle
+technologyStack=Backend
+projectTemplate=Aggregate
+glossaryId=0

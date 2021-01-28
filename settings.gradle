@@ -1,0 +1,7 @@
+rootProject.name = 'drama-demo'
+include 'demo-boot'
+include 'demo-boot-embed'
+include 'demo-aggregate'
+include 'demo-flow'
+include 'demo-event'
+include 'demo-facade'

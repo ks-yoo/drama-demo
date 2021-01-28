@@ -1,0 +1,24 @@
+buildscript {
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootGradlePluginVersion}")
+    }
+}
+
+plugins {
+    id 'org.springframework.boot' version '2.0.4.RELEASE'
+}
+
+apply plugin: 'java'
+dependencies {
+    implementation project(':demo-facade')
+    implementation("io.springfox:springfox-swagger2:${swaggerVersion}")
+    implementation("io.springfox:springfox-swagger-ui:${swaggerVersion}")
+    runtime('com.sun.xml.bind:jaxb-core:2.3.0.1')
+    runtime('com.sun.xml.bind:jaxb-impl:2.3.1')
+    runtime('javax.xml.bind:jaxb-api:2.3.1')
+    runtime('org.javassist:javassist:3.23.1-GA')
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0,'seconds'
+}

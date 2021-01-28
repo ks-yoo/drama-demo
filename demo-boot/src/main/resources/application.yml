@@ -1,0 +1,130 @@
+spring:
+  application:
+    name: demo
+  profiles:
+    active: default
+
+server:
+  port: 9093
+
+grpc:
+  port: 19110
+
+nara:
+  cinechart:
+    protocol: http
+    hostname: 127.0.0.1
+    port: 9111
+
+  public_resource_path: /public/**
+  daysman:
+    id: io.naradrama.demo
+    subscriptions: >
+      io.naraplatform.stage
+    bootstrap-address: localhost:9092
+  swagger:
+    authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJzdGV2ZUBuZXh0cmVlLmlvIiwic2NvcGUiOlsic2NvcGUiXSwid29ya3NwYWNlcyI6eyJzdGF0aW9uV29ya3NwYWNlcyI6bnVsbCwic3F1YXJlV29ya3NwYWNlcyI6bnVsbCwicGF2aWxpb25Xb3Jrc3BhY2VzIjpudWxsLCJjaW5lcm9vbVdvcmtzcGFjZXMiOlt7ImlkIjoibmUxLW0xLWMxIiwibmFtZSI6IlN0ZXZlIiwidGVuYW50SWQiOiJvMS1yQG5lMS1tMS1jMSIsInJvbGVzIjpbIkFkbWluIiwiVXNlciJdfSx7ImlkIjoibmUxLW0xLWMyIiwibmFtZSI6IlN0ZXZlIiwidGVuYW50SWQiOiJvMS1yQG5lMS1tMS1jMiIsInJvbGVzIjpbIlVzZXIiXX1dLCJzdHVkaW9Xb3Jrc3BhY2UiOm51bGx9LCJleHAiOjE1OTAwNjM4MjEsImFkZHRpb25hbEluZm9ybWF0aW9uIjp7fSwiYXV0aG9yaXRpZXMiOlsiVVNFUiJdLCJqdGkiOiI0ZjkwOTdiZS1jMTI0LTRkZTctODU3NC0wNzFjODY5MjMxOTAiLCJjbGllbnRfaWQiOiJjbGllbnQifQ.12-ndMQGQY8MvsV7MyfBQiOIHOQD-rmDK37gkhxQJpY'
+  demo:
+    command:
+      hostname: localhost
+      port: ${grpc.port}
+    query:
+      hostname: localhost
+      port: ${grpc.port}
+
+logging:
+  level:
+    io.naradrama: info
+    io.naraplatform: info
+  pattern:
+    console: '%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-60.60logger{59}){cyan} %clr(:){faint} %m%n%wEx'
+
+
+---
+spring:
+  profiles: default
+  datasource:
+    url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: sa
+
+  jpa:
+    hibernate.ddl-auto: create
+    generate-ddl: true
+server:
+  port: 9093
+
+---
+spring:
+  profiles: k8s_test
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://${publicUrl}:3306/demo
+    username: demo
+    password: demo
+
+  jpa:
+    hibernate.ddl-auto: update
+    generate-ddl: true
+
+server:
+  port: 8080
+nara:
+  daysman:
+    cdc-mode: false
+    service-host: localhost
+    service-port: 6565
+logging:
+  level:
+    root: info
+    io.naradrama: info
+    io.naraplatform: info
+
+
+---
+spring:
+  profiles: local
+  datasource:
+    url: jdbc:mariadb://${publicUrl}:3306/demo
+    username: demo
+    password: demo
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    hibernate.ddl-auto: update
+    generate-ddl: true
+
+
+---
+spring:
+  profiles: k8s
+  datasource:
+    driver-class-name: ${datasource.driver-class-name}
+    url: ${datasource.url}
+    username: ${datasource.username}
+    password: ${datasource.password}
+  jpa:
+    hibernate:
+      ddl-auto: ${hibernate.ddl-auto}
+    properties:
+      hibernate:
+        show_sql: ${hibernate.show_sql}
+        use_sql_comments: ${hibernate.use_sql_comments}
+        format_sql: ${hibernate.format_sql}
+        enable_lazy_load_no_trans: ${hibernate.enable_lazy_load_no_trans}
+
+server:
+  port: 8080
+
+grpc:
+  port: 8090
+
+nara:
+  daysman:
+    bootstrap-address: ${daysman.bootstrap-address}
+
+logging:
+  level:
+    root: ${log.level.root}
+    io.naradrama: ${log.level.io.naradrama}
+    io.naraplatform: ${log.level.io.naraplatform}
+

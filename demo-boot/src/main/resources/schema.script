@@ -1,0 +1,9 @@
+## DB 스키마 생성
+
+use mysql;
+CREATE DATABASE demo CHARACTER SET utf8 COLLATE utf8_general_ci;
+Create user 'demo'@'%' identified by 'demo';
+Create user 'demo'@'localhost' identified by 'demo';
+Grant all privileges on demo.* to demo@'%';
+Grant all privileges on demo.* to demo@'localhost';
+Flush privileges;

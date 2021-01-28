@@ -1,0 +1,19 @@
+dramaId: '0110'
+version: 1.0.0
+note: this is the 1.0.34 note.
+roles:
+  - Admin
+  - TeamLeader
+  - Member
+  - Guest
+
+editions:
+  - Standard
+features:
+  - name: Demo
+    memo: DemoService
+    editions:
+      - Standard
+
+domainSpecPackage: io.naradrama.demo
+domainJarPrefix: demo-domain

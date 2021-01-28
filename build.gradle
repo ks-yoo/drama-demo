@@ -1,0 +1,114 @@
+plugins {
+    id 'maven'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+}
+
+ext {
+    demoVersion = '0.1.0-SNAPSHOT'
+    cinechartVersion = '0.9.0-SNAPSHOT'
+    prologueVersion = '0.10.0-SNAPSHOT'
+    stageVersion = '0.9.0-SNAPSHOT'
+    daysmanVersion = '0.10.0-SNAPSHOT'
+    stageEnvoyVersion = '0.10.0-SNAPSHOT'
+    springBootVersion = '2.1.5.RELEASE'
+    springCloudVersion = 'Greenwich.RELEASE'
+    springCloudStreamVersion = 'Greenwich.RELEASE'
+    springBootGradlePluginVersion = '2.1.5.RELEASE'
+    lombokVersion = '1.18.10'
+    swaggerVersion = '2.9.2'
+    jUnitBomVersion = '5.6.2'
+    mockitoCoreVersion = '3.1.0'
+    mockitoJupiterVersion = '3.1.0'
+}
+
+allprojects {
+    group 'io.naradrama'
+    version demoVersion
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0,'seconds'
+}
+
+def useMavenLocalFirst = false
+// If has Nexus(Nextree private) account -> useNexus = true Else useNexus = false
+def useNexus = false
+
+def nexusBaseUrl = 'http://35.221.123.58/repository/'
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'maven-publish'
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+    repositories {
+        if (useMavenLocalFirst) {
+            mavenLocal()
+        }
+        if(useNexus) {
+            maven {
+                credentials {
+                    username = System.getenv("NEXUS_ID") ?: nexususer
+                    password = System.getenv("NEXUS_PASSWORD") ?: nexuspassword
+                }
+                url "${nexusBaseUrl}/nara-public/"
+            }
+        } else {
+            flatDir {
+                dirs './public-libs'
+            }
+        }
+        if (!useMavenLocalFirst) {
+            mavenLocal()
+        }
+        jcenter()
+    }
+    publishing {
+        repositories {
+            maven {
+                credentials {
+                    username = System.getenv("NEXUS_ID") ?: nexususer
+                    password = System.getenv("NEXUS_PASSWORD") ?: nexuspassword
+                }
+                def releasesRepoUrl = nexusBaseUrl + '/nara-release'
+                def snapshotsRepoUrl = nexusBaseUrl + '/nara-snapshots'
+                url = version.endsWith("SNAPSHOT") ? snapshotsRepoUrl : releasesRepoUrl
+            }
+        }
+    }
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+        }
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
+    }
+    dependencies {
+        if(useNexus){
+            implementation("io.naradrama:prologue:${prologueVersion}")
+
+            implementation("io.naraplatform:stage-domain:${stageVersion}")
+            implementation("io.naraplatform:daysman-daysboy:${daysmanVersion}")
+            implementation("io.naraplatform:daysman-daysboy-jpa:${daysmanVersion}")
+        } else {
+            implementation ("io.naradrama:prologue:${prologueVersion}-all")
+        }
+
+        implementation('org.mariadb.jdbc:mariadb-java-client')
+        implementation('com.h2database:h2')
+        implementation('org.springframework.boot:spring-boot-starter-web')
+        compileOnly("org.projectlombok:lombok:${lombokVersion}")
+        annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+        testImplementation(platform("org.junit:junit-bom:${jUnitBomVersion}"))
+        testImplementation('org.junit.jupiter:junit-jupiter')
+        testImplementation("org.mockito:mockito-core:${mockitoCoreVersion}")
+        testImplementation("org.mockito:mockito-junit-jupiter:${mockitoJupiterVersion}")
+    }
+    test {
+        useJUnitPlatform()
+    }
+    clean {
+        delete file('src/main/generated')
+    }
+}

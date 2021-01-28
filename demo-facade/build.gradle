@@ -1,0 +1,8 @@
+dependencies {
+    api project(':demo-aggregate')
+    api project(':demo-flow')
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0,'seconds'
+}
